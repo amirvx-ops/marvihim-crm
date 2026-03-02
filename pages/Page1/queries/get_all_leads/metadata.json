@@ -5,7 +5,7 @@
   "pluginType": "DB",
   "unpublishedAction": {
     "actionConfiguration": {
-      "body": "SELECT \n    leads.id AS \"מזהה_ליד\",\n    leads.updated_at AS \"תאריך\",\n    customers.full_name AS \"שם_הלקוח\",\n    customers.identity_number AS \"תעודת_זהות\",\n    partners.name AS \"מקור_הליד\",\n    leads.main_status AS \"סטטוס\"\nFROM leads\nLEFT JOIN customers ON leads.customer_id = customers.id\nLEFT JOIN partners ON leads.partner_id = partners.id\nWHERE \n    -- נשאיר רק את החיפוש החופשי (שם או ת\"ז)\n    (customers.full_name ILIKE '%{{inp_search.text}}%' \n     OR customers.identity_number LIKE '%{{inp_search.text}}%' \n     OR '{{inp_search.text}}' = '')",
+      "body": "SELECT\n    leads.id AS \"מזהה_ליד\",\n    leads.updated_at AS \"תאריך\",\n    customers.full_name AS \"שם_הלקוח\",\n    customers.identity_number AS \"תעודת_זהות\",\n    partners.name AS \"מקור_הליד\",\n    leads.main_status AS \"סטטוס\",\n    COALESCE(SUM(transactions.premium_amount), 0) AS \"פרמיה_סך_הכל\"\nFROM leads\nLEFT JOIN customers ON leads.customer_id = customers.id\nLEFT JOIN partners ON leads.partner_id = partners.id\nLEFT JOIN transactions ON leads.id = transactions.lead_id\nWHERE\n    -- חיפוש חופשי (שם או תעודת זהות) - ILIKE עבור כל תנאי חיפוש\n    (customers.full_name ILIKE '%{{inp_search.text}}%'\n     OR customers.identity_number ILIKE '%{{inp_search.text}}%'\n     OR '{{inp_search.text}}' = '')\nGROUP BY leads.id, leads.updated_at, customers.full_name, customers.identity_number, partners.name, leads.main_status\nORDER BY leads.updated_at DESC",
       "encodeParamsToggle": true,
       "paginationType": "NONE",
       "pluginSpecifiedTemplates": [
