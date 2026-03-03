@@ -1,3 +1,0 @@
-UPDATE leads
-SET main_status = '{{LEADS.selectedRow.סטטוס}}'
-WHERE id = '{{LEADS.selectedRow.מזהה_ליד}}'::uuid;
